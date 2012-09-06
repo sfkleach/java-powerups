@@ -1,0 +1,59 @@
+[] Notes on the implementation of File Based VFS
+
+
+VItemRef
+	VfolderRef
+		AbsVFolderRef
+	VFileRef
+		AbsVFileRef
+
+VItem
+	VFolder
+	VFile
+	AbsVItem
+		AbsVFolder implements VFolder
+			PathAbsVFolder
+		AbsVFile implements VFile
+			PathAbsVFile
+
+Planned virtual filing systems
+	CVS
+
+Extensions
+	Signed source files
+	Multiple nested content encodings
+	Multiple nested archive encodings
+
+This is no longer correct.  Refer to the source code.  Sorry.  [Steve Leach, Aug 04]
+
+VFS = Virtual Filing System
+
+[1] File name encoding/decoding.
+
+[1.1] The VFS has no interest in the deficiencies of the implementation layer - in this case the
+filing system.  The fact that files cannot have arbitrary names is an issue because we
+must be able to encode and decode name and extension into a valid filename.
+
+[1.2] Here's the scheme for a non-Unicode filesystem
+
+* One character is nominated to play the role of the separator e.g. "." or "-"
+
+* Encode the name and extension using URL encoding with UTF-8.  Make a separate pass to encode any
+  instances of the separator using the URL encoding scheme.  (That means it can be safely decoded
+  with URL decoding.)
+
+* Glue together.
+
+[1.3] Reminder of URL encoding
+
+The alphanumeric characters "a" through  "z", "A" through  "Z" and "0" through "9" remain the same.
+The special characters ".",  "-", "*", and  "_" remain the same.
+The space character "Ê" is  converted into a plus sign "+".
+All other characters are unsafe and are first converted into  one or more bytes using some encoding scheme.
+Then each byte is  represented by the 3-character string  "%xy", where xy is the  two-digit hexadecimal
+representation of the byte. The recommended encoding scheme to use is UTF-8. However, for compatibility reasons,
+if an encoding is not specified, then the default encoding of the platform is used.
+
+[1.4] Converting a String into UTF-8 octets
+
+byte[] octets = s.getBytes( "UTF-8" );
